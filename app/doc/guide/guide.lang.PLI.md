@@ -9,12 +9,12 @@ This guide is intended to be an IBM PL/I Language 101 textbook for open-system p
 
 - coded arithmetic data (rational numbers)
   - fixed decimal
-  - fixed binary signed
+  - fixed binary
   - fixed binary unsigned
   - float decimal
   - float binary
-- numeric picture data
-- text data
+- numeric character data (picture)
+- character data
   - characters (single-byte characters)
   - wide characters (UTF-16 characters)
   - graphics (double-byte characters)
@@ -27,6 +27,8 @@ Coded arithmetic data items are rational numbers.
 - for fixed-point data items, the position of the decimal or binary point is specified by a scaling factor declared for a variable.
 - for floating-point data items, the data is in the form of a fractional part and an exponent part.
 
+### The precision of coded arithmetic data
+
 The *precision* `(p, q)` of a coded arithmetic data item includes the number of digits `p` and the scaling factor `q`.
 
 <table>
@@ -34,7 +36,7 @@ The *precision* `(p, q)` of a coded arithmetic data item includes the number of 
 <thead>
 <tr>
 <th><code>declare</code> statement
-<th>description
+<th>description of the precision
 <tbody>
 <tr>
 <td rowspan="2"><code>fixed dec (p,q)</code>
@@ -54,7 +56,7 @@ The *precision* `(p, q)` of a coded arithmetic data item includes the number of 
 <td><code>p</code>: the number of significant digits
 </table>
 
-> `fixed bin (p,q) unsigned` is omitted for simplicity.
+> For floating-point items, the scaling factor is not applicable.
 
 The number of digits `p`:
 - for fixed-point items, the integer is the number of significant digits
@@ -66,7 +68,9 @@ The scaling factor `q` for fixed-point items (optional, default 0) specifies the
 - A positive scaling factor (`q`) that is larger than the number of digits specifies a fraction, with the point assumed to be located `q` places to the left of the rightmost actual digit.
 - In either case, intervening zeros are assumed, but they are not stored; only the specified number of digits is actually stored.
 
-> For floating-point items, the scaling factor is not applicable.
+Rational numbers defined with `fixed bin (p,q)` can be non-negative or negative (i.e., signed numbers), whereas those with `fixed bin (p,q) unsigned` can only be non-negative (i.e., unsigned numbers).
+
+Rational numbers defined with `fixed dec (p, q)` are encoded in the signed-packed-decimal format, which represents signed numbers.
 
 <table>
 <caption>Examples of the precision
@@ -79,13 +83,20 @@ The scaling factor `q` for fixed-point items (optional, default 0) specifies the
 <tr>
 <td><code>fixed dec (5,-2)
 <td><code>3_141_600
-<td rowspan="3" class="center">31416
+<td rowspan="3" class="center"><code>'31_41_6C'X
 <tr>
 <td><code>fixed dec (5)
 <td><code>31_416
 <tr>
 <td><code>fixed dec (5,4)
 <td><code>3.141_6
+<tr>
+<td><code>fixed bin (7,0)
+<td><code>101_1011B
+<td rowspan="2" class="center"><code>'0101_1011'B
+<tr>
+<td><code>fixed bin (7,3)
+<td><code>1011.011B
 <tr>
 <td><code>float dec (2)
 <td><code>15E-23
@@ -99,9 +110,32 @@ The scaling factor `q` for fixed-point items (optional, default 0) specifies the
 <tr>
 <td><code>float dec (9)
 <td><code>.003_141_593E3
+<tr>
+<td><code>float bin (6)
+<td><code>10_1101E5B
+<td rowspan="4" class="center">according to IEEE
+<tr>
+<td><code>float bin (6)
+<td><code>101.101E5B
+<tr>
+<td><code>float bin (5)
+<td><code>1_1101E-28B
+<tr>
+<td><code>float bin (4)
+<td><code>11.01E+42B
 </table>
 
-The `ALIGNED` data alignment attribute is the default for coded arithmetic data. `ALIGNED` specifies that the data element is aligned on the storage boundary corresponding to its data-type requirement.
+### Alignment requirements for coded arithmetic data
+
+Data access can be faster if half-words (2-bytes entities), full-words (4-bytes), and double-words (8-bytes) are located in main storage on an integral boundary for that unit of information. The integral boundaries are:
+
+- for half-words: `...0`, `...2`, `..4`, &ctdot;, `...c`, or `...e`
+- for full-words: `...0`, `...4`, `...8`, or `...c`
+- for double-words: `...0` or `...8`
+
+PL/I allows data alignment on integral boundaries. The ALIGNED and UNALIGNED attributes allow you to choose whether or not to align data on the appropriate integral boundary. ALIGNED specifies that the data element is aligned on the storage boundary corresponding to its data-type requirement. UNALIGNED specifies that each data element is mapped on the next byte boundary.
+
+> ALIGNED is the default for coded arithmetic data.
 
 <table>
 <caption>Alignment of fixed decimal and binary data, Table 28 [PLI3.5]
@@ -116,7 +150,7 @@ The `ALIGNED` data alignment attribute is the default for coded arithmetic data.
 <tr>
 <td><code>fixed dec (p,q)
 <td>
-<td class="center">packed decimal
+<td class="center">signed packed-decimal
 <td class="center">ceil((p+1)/2)
 <td>any byte, 0 &ctdot; 7
 <tr>
@@ -146,6 +180,24 @@ The `ALIGNED` data alignment attribute is the default for coded arithmetic data.
 </table>
 
 > `fixed bin (p,q) unsigned` has different alignment requirements. For the details, refer to [PLI3.5].
+
+In the *signed-packed-decimal* format, each byte contains two decimal digits (`D`), except for the rightmost byte, which contains a sign (`S`) to the right of decimal digit. (*Decimal-Number Formats*, Chapter 8 [zArch])
+
+| signed-packed-decimal format |
+|:----------------------------:|
+| `D` `D` `D` `D` &ctdot; `D` `D` `D` `S` |
+
+- The decimal digits have the binary encoding `0000` &ctdot; `1001`.
+- The sign code for plus is `1100`, or can be `1111`.
+- The sign code for minus is `1101`.
+
+The declared number of data bits, `p` of `fixed bin (p, q)`, is in the low-order positions, but the extra high-order bits participate in any operation performed upon the data item. Any arithmetic overflow into such extra high-order bit positions can be detected only if the SIZE condition is enabled.
+
+For signed binary integers, the leftmost bit represents the sign, which is followed by the numeric field. (*Data Format*, Chapter 7 [zArch])
+
+- Positive numbers are represented in tru notation with the sign bit set to zero.
+- When the value is zero, all bits are zeros, including the sign bit.
+- Negative numbers are represented in two's complement binary notation with a one in the sign-bit position.
 
 <table>
 <caption>Alignment of float decimal and binary data, Table 28 [PLI3.5]
@@ -200,13 +252,14 @@ The default is IEEE. All computations are done using IEEE floating-point; variab
 
 > IEEE decimal floating-point format has been supported since V3R7 (October 2007).
 
-## Text data
+## Character data
 
-## Picture data
+## Numeric character data (picture)
 
 ## Bits
 
 # References
 
 - [[PLI3.5](http://publibfp.boulder.ibm.com/epubs/pdf/ibm3lr40.pdf)] IBM. *Enterprise PL/I for z/OS Language Reference*, 7th Edition for PL/I 3.5 (SC27-1460-05). 2005. Retrieved April 2024.
+- [[zArch](https://publibfp.dhe.ibm.com/epubs/pdf/a227832d.pdf)] IBM. z/Architecture Principles of Operation, 14th Edition (SA22-7832-13). 2022. Retrieved April 2024.
 
