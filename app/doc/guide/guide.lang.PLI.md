@@ -20,6 +20,30 @@ This guide is intended to be an IBM PL/I Language 101 textbook for open-system p
   - graphics (double-byte characters)
 - bits
 
+## Declarations
+
+The `DECLARE` statement me be used to declare one or more variables. Simple forms of the `DECLARE` statement useful for present purpose are as follows:
+
+```
+DECLARE id   attributes;
+DECLARE id-1 attributes-1,
+        ...,
+        id-n attributes-n;
+DECLARE (id-1, ..., id-n) attributes;
+```
+
+In the above, `id` is the name of the variable and `attributes` is a list of attribute keywords. `DECLARE` may be abbreviated `DCL`, as in the following examples:
+
+```
+DCL S CHAR (20);
+DCL X BIT (6),
+    Y FIXED DEC (10,2),
+    Z FLOAT DEC (8);
+DCL (U,V,W) FIXED BIN (15);
+```
+
+(Reference: Chapter1 [Dritz])
+
 ## Coded arithmetic data
 
 Coded arithmetic data items are rational numbers.
@@ -73,7 +97,7 @@ Rational numbers defined with `fixed bin (p,q)` can be non-negative or negative 
 Rational numbers defined with `fixed dec (p, q)` are encoded in the signed-packed-decimal format, which represents signed numbers.
 
 <table>
-<caption>Examples of the precision
+<caption>Examples of coded arithmetic data
 <thead>
 <tr>
 <th><code>declare
@@ -91,19 +115,27 @@ Rational numbers defined with `fixed dec (p, q)` are encoded in the signed-packe
 <td><code>fixed dec (5,4)
 <td><code>3.141_6
 <tr>
-<td><code>fixed bin (7,0)
-<td><code>101_1011B
-<td rowspan="2" class="center"><code>'0101_1011'B
+<td><code>fixed dec (5,4)
+<td><code>-3.141_6
+<td class="center"><code>'31_41_6D'X
 <tr>
-<td><code>fixed bin (7,3)
-<td><code>1011.011B
+<td><code>fixed bin (5,0)
+<td><code>1_0110B
+<td rowspan="2" class="center"><code>'0001_0110'B
+<tr>
+<td><code>fixed bin (5,3)
+<td><code>10.110B
+<tr>
+<td><code>fixed bin (5,0)
+<td><code>-1_0110B
+<td class="center"><code>'1001_0110'B
 <tr>
 <td><code>float dec (2)
 <td><code>15E-23
 <td rowspan="4" class="center">according to IEEE
 <tr>
 <td><code>float dec (3)
-<td><code>1.96E+07
+<td><code>-1.96E+07
 <tr>
 <td><code>float dec (7)
 <td><code>3_141_593E-6
@@ -116,7 +148,7 @@ Rational numbers defined with `fixed dec (p, q)` are encoded in the signed-packe
 <td rowspan="4" class="center">according to IEEE
 <tr>
 <td><code>float bin (6)
-<td><code>101.101E5B
+<td><code>-101.101E5B
 <tr>
 <td><code>float bin (5)
 <td><code>1_1101E-28B
@@ -262,4 +294,5 @@ The default is IEEE. All computations are done using IEEE floating-point; variab
 
 - [[PLI3.5](http://publibfp.boulder.ibm.com/epubs/pdf/ibm3lr40.pdf)] IBM. *Enterprise PL/I for z/OS Language Reference*, 7th Edition for PL/I 3.5 (SC27-1460-05). 2005. Retrieved April 2024.
 - [[zArch](https://publibfp.dhe.ibm.com/epubs/pdf/a227832d.pdf)] IBM. z/Architecture Principles of Operation, 14th Edition (SA22-7832-13). 2022. Retrieved April 2024.
+- [[Dritz](https://www.osti.gov/servlets/purl/7150488)] Dritz, K.W. *Class Notes for a PL/I Course*. 1975. Retrieved April 2024.
 
