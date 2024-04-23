@@ -25,21 +25,21 @@ This guide is intended to be an IBM PL/I Language 101 textbook for open-system p
 The `DECLARE` statement me be used to declare one or more variables. Simple forms of the `DECLARE` statement useful for present purpose are as follows:
 
 ```
-DECLARE id   attributes;
-DECLARE id-1 attributes-1,
+declare id   attributes;
+declare id-1 attributes-1,
         ...,
         id-n attributes-n;
-DECLARE (id-1, ..., id-n) attributes;
+declare (id-1, ..., id-n) attributes;
 ```
 
 In the above, `id` is the name of the variable and `attributes` is a list of attribute keywords. `DECLARE` may be abbreviated `DCL`, as in the following examples:
 
 ```
-DCL S CHAR (20);
-DCL X BIT (6),
-    Y FIXED DEC (10,2),
-    Z FLOAT DEC (8);
-DCL (U,V,W) FIXED BIN (15);
+dcl s char (20);
+dcl x bit (6),
+    y fixed dec (10,2),
+    z float dec (8);
+dcl (u,v,w) fixed bin (15);
 ```
 
 (Reference: Chapter1 [Dritz])
@@ -126,9 +126,9 @@ Rational numbers defined with `fixed dec (p, q)` are encoded in the signed-packe
 <td><code>fixed bin (5,3)
 <td><code>10.110B
 <tr>
-<td><code>fixed bin (5,0)
-<td><code>-1_0110B
-<td class="center"><code>'1001_0110'B
+<td><code>fixed bin (8,0)
+<td><code>-1B
+<td class="center"><code>'1111_1111'B
 <tr>
 <td><code>float dec (2)
 <td><code>15E-23
@@ -161,6 +161,7 @@ Rational numbers defined with `fixed dec (p, q)` are encoded in the signed-packe
 
 Data access can be faster if half-words (2-bytes entities), full-words (4-bytes), and double-words (8-bytes) are located in main storage on an integral boundary for that unit of information. The integral boundaries are:
 
+- for bytes: `...0`, `...1`, `...2`, &ctdot; `...e`, or `...f`
 - for half-words: `...0`, `...2`, `..4`, &ctdot;, `...c`, or `...e`
 - for full-words: `...0`, `...4`, `...8`, or `...c`
 - for double-words: `...0` or `...8`
