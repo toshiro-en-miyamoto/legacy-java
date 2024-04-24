@@ -32,7 +32,7 @@ declare id-1 attributes-1,
 declare (id-1, ..., id-n) attributes;
 ```
 
-In the above, `id` is the name of the variable and `attributes` is a list of attribute keywords. `DECLARE` may be abbreviated `DCL`, as in the following examples:
+In the above, `id` is the name of the variable and `attributes` is a list of attribute keywords. The first form declares a single variable. The second form declares several, with potentially different attributes, in one `DECLARE` statement. The third declares several with a common set of attributes. `DECLARE` may be abbreviated `DCL`, as in the following examples:
 
 ```
 dcl s char (20);
@@ -176,7 +176,7 @@ PL/I allows data alignment on integral boundaries. The ALIGNED and UNALIGNED att
 <tr>
 <th>fixed type
 <th>digits
-<th>internally
+<th class="center">internally
 <th>storage (bytes)
 <th>data can begin on
 <tbody>
@@ -286,6 +286,18 @@ The default is IEEE. All computations are done using IEEE floating-point; variab
 > IEEE decimal floating-point format has been supported since V3R7 (October 2007).
 
 ## Character data
+
+*Character encoding* is the process of assigning numbers to graphical characters, especially the written characters of human language, allowing them to be stored, transmitted, and transformed using computers.
+
+`DECLARE` statement supports the following character encodings:
+
+| coded character sets          | attribute   | abbreviation
+|-------------------------------|-------------|--------------
+| EBCDIC single-byte characters | `CHARACTER` | `CHAR`        
+| EBCDIC double-byte characters | `GRAPHIC`   | `G`
+| Unicode UTF-16                | `WIDECHAR`  | `WCHAR`
+
+### `CHARACTER` attribute
 
 ## Numeric character data (picture)
 
